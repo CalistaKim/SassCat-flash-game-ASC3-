@@ -1,4 +1,4 @@
-# SassCat-flash-game-ASC3-
+# SassCat-flash-game-ASC3--
 /// 
 The concept of the game is for the player to discover environment interactivity by exploration and acting intuitively with objects that appear in the game. The player gains points as they explore, leading to levelling up which reveals more game features.
 Two main type of interactivity in this version :
