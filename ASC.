@@ -1,0 +1,575 @@
+package 
+{
+	import flash.display.*;  // includes MovieClip class
+	import flash.events.*;   // includes KeyboardEvent class
+	import flash.ui.*;       // includes Keyboard class
+	import flash.text.TextField;
+	import flash.sensors.Accelerometer;
+	import flash.utils.Timer;
+	import flash.media.SoundMixer;
+	import flash.media.Sound;
+	
+	public class SassCat extends MovieClip 
+	{
+		var question:Array = new Array();
+		var answerList:Array = new Array();
+		var usedList:Array = new Array();
+		var number:int = Math.round(Math.random()*10);
+		var monscore: int = 0;
+		var lvl: int = 1;
+		var timer: Timer = new Timer(18000,11); 
+		var Q;
+		//sounds
+		var plantGrow:Sound = new PlantSound();
+		var lvlSound:Sound = new lvlUpSound();
+		var floorPanel:Sound = new FloorSound();
+		var pop:Sound = new FoodPop();
+		var munch:Sound = new CartoonMunch();
+		//food items
+			var myBurger: burger = new burger();
+			var myCake: cake = new cake();
+			var myClefairy: clefairy = new clefairy();
+			var myJelly: jelly = new jelly();
+			var myRamen: ramen = new ramen();
+			var myTaiyaki: taiyaki = new taiyaki();
+			var foodArray: Array = new Array;
+			
+			var random:int = Math.round(Math.random()*5);
+			var newTimer:Timer = new Timer (25000);
+			
+		public function SassCat() //constructor function
+		{	
+			happy.alpha = 0;
+			sad.alpha = 0;
+			scared.alpha = 0;
+			lvlOne.alpha = 0;
+			lvlTwo.alpha = 0;
+			lvlThree.alpha = 0;
+			lvlFour.alpha = 0;
+			lvlFive.alpha = 0;
+			lvlSix.alpha = 0;
+			window.alpha = 0;
+			bed.alpha = 0;
+			
+			question[0] = "do you think the \n cat next door is cute?”";
+			question[1] = "What do you think of dogs?”";
+			question[2] = "meow";
+			question[3] = "what is your name?";
+			question[4] = "Why is your hair so big.";
+			question[5] = "guess how many lives I have";
+			question[6] = "What has a spine \n but no bones?";
+			question[7] = "What has bones \n but no spine?";
+			question[8] = "If you’ve got it you can’t share it, and if you’ve shared it \n you haven’t got it. What am I?";
+			question[9] = "Is butter a carb?";
+			question[10] = "you’re like, really pretty";
+			
+			answerList[0] = "yes";
+			answerList[1] = "gross";
+			answerList[2] = "meow";
+			answerList[3] = "alexia";
+			answerList[4] = "its full of secrets";
+			answerList[5] =  "1";
+			answerList[6] = "a book";
+			answerList[7] = "you";
+			answerList[8] = "a secret";
+			answerList[9] = "yes";
+			answerList[10] = "thanks";
+			timer.start();	
+			stage.addEventListener(Event.ENTER_FRAME, meterIncrease);
+			timer.addEventListener(TimerEvent.TIMER, checkIfUsed);
+			stage.addEventListener( KeyboardEvent.KEY_DOWN, checkAns);
+			ball.addEventListener( MouseEvent.MOUSE_DOWN, beginDrag );
+			ball.addEventListener( MouseEvent.MOUSE_UP, endDrag );
+
+			trace( number );
+			
+			//food function
+			foodArray[0] = myBurger;
+			foodArray[1] = myCake;
+			foodArray[2] = myClefairy;
+			foodArray[3] = myJelly;
+			foodArray[4] = myRamen;
+			foodArray[5] = myTaiyaki;
+			
+			newTimer.addEventListener(TimerEvent.TIMER,addFood);
+			newTimer.start();
+			myBurger.addEventListener(MouseEvent.CLICK, clickFood);
+			myCake.addEventListener(MouseEvent.CLICK, clickFood);
+			myClefairy.addEventListener(MouseEvent.CLICK, clickFood);
+			myJelly.addEventListener(MouseEvent.CLICK, clickFood);
+			myRamen.addEventListener(MouseEvent.CLICK, clickFood);
+			myTaiyaki.addEventListener(MouseEvent.CLICK, clickFood);
+			
+			trace(random);
+		}	
+		//put event listener for timer inside an if statement, if a random number is reached, then execute (have another timer player playing)
+		//////this will start the function randomly every 1-3 mintues
+		
+			function addFood(evt:TimerEvent){
+			random = Math.round(Math.random() * foodArray.length -1);
+			var randomFood = foodArray[random];
+			
+			var timerObj:Timer = evt.target as Timer;
+			var delayTime:int = Math.round(Math.random()*25000)+5000;
+			timerObj.delay = delayTime;
+			
+			randomFood.visible = true;
+			randomFood.x = Math.round(Math.random()*500);
+			randomFood.y = Math.round(400+ Math.random()*550);
+			
+			addChild(randomFood);
+			randomFood.play();
+			trace("added food is: " + randomFood)
+		}
+		
+		function clickFood(evt:MouseEvent){
+			var randomFood = foodArray[random]
+			if (randomFood.parent) {
+					randomFood.visible = false;
+					//myBurger.visible = false;
+					munch.play();
+					monscore += 2;
+					box.PromptBox.text = "YUM"
+					trace(monscore);
+					trace("removed food is: " + randomFood)
+			}
+		}		
+		function beginDrag(evt:MouseEvent){
+			ball.startDrag( );
+			scared.alpha = 1;
+			happy.alpha = 0;
+			sad.alpha = 0;
+			mon.alpha = 0;
+			pop.play();
+			box.PromptBox.text = "DON'T TOUCH IT THATS MINE"
+
+			if ( (ball.x >= 550 && ball.x <= 574) && (ball.y >= 140 && ball.y <= 165) ){
+				monscore += 2;
+				box.PromptBox.text = "noooo why did you leave it so high up";
+				trace("monscore is:" + monscore)
+			}
+		}
+		
+		function endDrag(evt:MouseEvent){
+			ball.stopDrag();
+			scared.alpha = 0;
+			mon.alpha = 1;
+			box.PromptBox.text = "human ... watch out"
+		}
+		
+		function checkIfUsed (evt: TimerEvent)
+		{			
+
+			var used = usedQuestion();
+			
+			Q = showQuestion();
+			while(used == true){
+				Q = showQuestion();
+				used = usedQuestion();
+				trace (used);
+			}
+			
+			box.PromptBox.text = Q;
+			
+			usedList.push(Q);
+
+		}
+		
+		function showQuestion():String{
+				
+			number= Math.round(Math.random() * question.length -1);
+			
+			return question[number];
+		} // showQuestion
+				
+		function checkAns(evt: KeyboardEvent){
+			var ans:String = boxxy.TypeBox.text;
+			var correctAns = answerList[number];
+			
+			if (evt.keyCode == Keyboard.ENTER){
+				trace (correctAns);	
+					if (correctAns == answerList[0]){
+						if (ans == correctAns || ans == "no"){
+							box.PromptBox.text = "hmm … "
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+						mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "I think he likes me";
+							}
+					}
+						
+					if (correctAns == answerList[1]){
+						if ((ans == correctAns || ans == "bad") ||( ans == "ew"|| ans == "evil")){
+							box.PromptBox.text = "I like you. "
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "";
+							}
+					}
+					if (correctAns == answerList[2]) {
+						if(ans == correctAns){
+							box.PromptBox.text = "purrrr "
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "meow";
+							}
+					}
+					if (correctAns == answerList[3]){
+						if(((ans == correctAns || ans == "sanam") ||( ans == "christine"|| ans == "annie"))||(ans == "lydia" || ans == "emese")){
+							box.PromptBox.text = "<3 <3 <3 "
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore)
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "hi";
+							}
+					}
+					if (correctAns == answerList[4]){
+						if(ans == correctAns || ans == "it's full of secrets"){
+							box.PromptBox.text = ":o !! "
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "hint: it's full of something";
+							}
+					}
+					if (correctAns == answerList[5]){
+						if (ans == correctAns || ans == "9"){
+							box.PromptBox.text = "aww how did you know?"
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "come on ... isn't this common sense";
+							}
+					}
+					if (correctAns == answerList[6]){
+						if (ans == correctAns || ans == "muse magazine"){
+							box.PromptBox.text = "heh clever aren't you"
+							monscore += 4;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "think hard human ... ";
+							}
+					}
+					if (correctAns == answerList[7]){ 
+						if (ans == correctAns || ans == "a wimp"){
+							box.PromptBox.text = ""
+							monscore += 8;
+							sad.alpha = 0;
+							mon.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "YOU! hahahaha wimp.";
+							}
+					}
+					if (correctAns == answerList[8]){ 
+						if (ans == correctAns){
+							box.PromptBox.text = "shhhhhhh ....!"
+							monscore += 4;
+							mon.alpha = 0;
+							sad.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+						mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "hint: it's something you can't tell anyone!!";
+							}
+					}
+					if (correctAns == answerList[9]){
+						if (ans == correctAns){
+							box.PromptBox.text = "OMG."
+							monscore += 3;
+							sad.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+							mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "are you sure???";
+							}
+					}
+					if (correctAns == answerList[10]){
+						if (ans == correctAns || ans == "thank you"){
+							box.PromptBox.text = "So you agree, you \n think you’re really pretty??"
+							monscore += 4;
+							mon.alpha = 0; 
+							sad.alpha = 0;
+							happy.alpha = 1;
+							trace ("score is " + monscore);
+						}
+						else {
+						mon.alpha = 0;
+						happy.alpha = 0;						
+						sad.alpha = 1;
+						monscore -= 1;
+						box.PromptBox.text = "... you're welcome";
+							}
+					}
+				return boxxy.TypeBox.text = "";
+				}//end if 
+				mon.alpha = 1;
+				happy.alpha = 0;
+				sad.alpha =0;
+			}//end checkAns
+						
+		function meterIncrease (evt:Event){
+			if (lvl == 1 ){
+				if (monscore < 4){
+					lvlOne.alpha = 0;
+					lvlTwo.alpha = 0;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+				}
+				if (monscore >= 2){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 0;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+	
+				}
+				if (monscore >= 4){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+
+				}
+				if (monscore >= 6){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;	
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+				}
+				if (monscore >= 8){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;
+					lvlFour.alpha = 1;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+		
+				}
+				if (monscore >= 10){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;
+					lvlFour.alpha = 1;
+					lvlFive.alpha = 1;
+					lvlSix.alpha = 0;
+					
+				}			
+				if (monscore >= 12){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;
+					lvlFour.alpha = 1;
+					lvlFive.alpha = 1;
+					lvlSix.alpha = 1;
+				
+				}
+				if (monscore >= 13){
+					lvlOne.alpha = 0;
+					lvlTwo.alpha = 0;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+					
+					
+					base.alpha = 0;
+					scared.alpha = 0;
+					happy.alpha = 1;
+					mon.alpha = 0;
+					walls.play();
+					floorOne.play();
+					
+					lvlUp.play();
+					lvl ++;
+					lvlCount.text = String(lvl);
+					lvlSound.play();
+					ball.visible = false;
+					ballPlace.visible = false;
+					monscore = 0;
+				}
+			}	//end level 1	
+			if (lvl ==2 ){
+				if (monscore < 4){
+					lvlOne.alpha = 0;
+					lvlTwo.alpha = 0;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+		
+				}
+				if (monscore >= 8){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 0;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+					
+				}
+				if (monscore >= 12){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+			
+				}
+				if (monscore >= 16){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;	
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+		
+				}
+				if (monscore >= 18){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;
+					lvlFour.alpha = 1;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+				
+				}
+				if (monscore >= 20){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;
+					lvlFour.alpha = 1;
+					lvlFive.alpha = 1;
+					lvlSix.alpha = 0;
+			
+				}			
+				if (monscore >= 24){
+					lvlOne.alpha = 1;
+					lvlTwo.alpha = 1;
+					lvlThree.alpha = 1;
+					lvlFour.alpha = 1;
+					lvlFive.alpha = 1;
+					lvlSix.alpha = 1;
+
+				}
+				if (monscore >= 28){
+					lvlOne.alpha = 0;
+					lvlTwo.alpha = 0;
+					lvlThree.alpha = 0;
+					lvlFour.alpha = 0;
+					lvlFive.alpha = 0;
+					lvlSix.alpha = 0;
+				
+					base.alpha = 0;
+					floorOne.alpha = 0;
+					
+					floor.play();
+					floorPanel.play();
+					window.alpha = 1;
+					bed.alpha = 1;
+					window.play();
+					plantGrow.play();
+				
+					bed.play();
+					lvlUp.play();
+					lvl ++;
+					lvlCount.text = String(lvl);
+					monscore = 0;
+				}
+			}
+		} //end meterIncrease
+		
+		
+		function usedQuestion(): Boolean
+		{
+			for (var i = 0; i < usedList.length; i++ ) {
+					if ( Q == usedList[i]) {
+						return true;
+					}
+				}
+			return false;
+		}//end usedQuestion 
+			
+		}//end public class
+	}//end package
