@@ -1,9 +1,13 @@
 # SassCat-flash-game-ASC3--
 /// 
-The concept of the game is for the player to discover environment interactivity by exploration and acting intuitively with objects that appear in the game. The player gains points as they explore, leading to levelling up which reveals more game features.
-Two main type of interactivity in this version :
+The concept of the game is for the player to discover environment interactivity by exploration and acting 
+intuitively with objects that appear in the game. The player gains points as they explore, leading to 
+levelling up which reveals more game features.
+
+Two main functions to gain points:
 1. answering questions (answers are arbitrary)
 2. clicking on food
+3. 
 CHEATS
 ----Questions and answers----
 1) “do you think the cat next door is cute?” a. yes/no
